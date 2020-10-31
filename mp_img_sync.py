@@ -11,6 +11,7 @@ import ttk_client
 import global_config
 import base64
 import hashlib
+import sys
 
 
 class SyncImg2DingTalk:
@@ -78,6 +79,8 @@ class SyncImg2DingTalk:
             conn.commit()
             cursor.close()
             self.cache[img_id] = encode
+            self.logger.warning(
+                "send new img successfully, cache was updated! size = {0} bytes".format(sys.getsizeof(self.cache)))
         except Exception as e:
             self.logger.error("insert data met error:" + e)
             raise e
@@ -103,8 +106,9 @@ class SyncImg2DingTalk:
             cursor = conn.cursor()
             self.logger.info("search sql:" + search_temp)
             data = cursor.execute(search_temp)
+            found = True if len(data.fetchall()) else False
             cursor.close()
-            return True if len(data.fetchall()) else False
+            return found
         except Exception as e:
             raise e
         finally:
@@ -166,7 +170,7 @@ class SyncImg2DingTalk:
         for item in items:
             self.logger.info("-*-" * 20 + '\n')
             if 'content' in item:
-                self.logger.warning("** sync skip ** 'text' type msg ignore")
+                self.logger.info("** syn skip ** 'text' type msg ignore")
                 continue
             img_id = item.get('id')
             fake_id = item.get('fakeid')
@@ -175,7 +179,7 @@ class SyncImg2DingTalk:
 
             # 记录校验,微信有记录存在则不继续
             if (self.is_exist(img_id=img_id)):
-                self.logger.warning("** job skip ** find img_id  ={0}".format(img_id))
+                self.logger.info("** job skip ** find img_id  ={0}".format(img_id))
                 continue
 
             # 保存图片
@@ -184,7 +188,7 @@ class SyncImg2DingTalk:
             # 记录校验,本地表情存在则不继续
             encode_ = self.encode_file(pic_path)
             if (self.is_exist(encode=encode_)):
-                self.logger.warning("** job skip ** find encode ={0}".format(encode_))
+                self.logger.info("** job skip ** find encode ={0}".format(encode_))
                 os.remove(pic_path)
                 continue
 

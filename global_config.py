@@ -60,6 +60,6 @@ DING_SECRET = 'SEC4d8e90ce12b9e3d9dc7b496200c857d4dd065d2008ece7254c5b799b8b8808
 DB_CONFIG = os.path.abspath("./sync_log.db")
 
 # »’÷æ
-logging.basicConfig(level=logging.ERROR, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger()
