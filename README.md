@@ -11,3 +11,7 @@ mac 客户端 brew cask install db-browser-for-sqlite
 
 ## 配置说明
 1. 基础配置在 global_config.py 文件中
+
+## 账号需求
+1. 1个微信公众号
+2. 1个sm.ms的个人空间
