@@ -9,6 +9,8 @@ import os
 import ding_chat_bot
 import ttk_client
 import global_config
+import base64
+import hashlib
 
 
 class SyncImg2DingTalk:
@@ -45,16 +47,16 @@ class SyncImg2DingTalk:
     def dis_connect_db(self):
         self.conn.close()
 
-    def insert_log(self, fake_id, img_id, nick_name, pic_url):
-        insert_temp = "INSERT INTO mp_sync_log(fake_id, img_id, nick_name, pic_url ,created_at) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}')"
+    def insert_log(self, fake_id, img_id, nick_name, encode):
+        insert_temp = "INSERT INTO mp_sync_log(fake_id, img_id, nick_name, encode ,created_at) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}')"
         try:
             conn = self.connect_db()
             cursor = conn.cursor()
-            sql = insert_temp.format(fake_id, img_id, nick_name, pic_url, self.now(False))
+            sql = insert_temp.format(fake_id, img_id, nick_name, encode, self.now(False))
+            self.logger.info("insert sql:" + sql)
             cursor.execute(sql)
             conn.commit()
             cursor.close()
-            self.logger.info("insert data:" + sql)
         except Exception as e:
             self.logger.error("isnert data met error:" + e)
             raise e
@@ -70,8 +72,8 @@ class SyncImg2DingTalk:
             search_temp += " AND img_id = '{0}'".format(kwargs.get('img_id'))
         if 'nick_name' in kwargs.keys():
             search_temp += " AND nick_name = '{0}'".format(kwargs.get('nick_name'))
-        if 'pic_url' in kwargs.keys():
-            search_temp += " AND pic_url = '{0}'".format(kwargs.get('pic_url'))
+        if 'encode' in kwargs.keys():
+            search_temp += " AND encode = '{0}'".format(kwargs.get('encode'))
         try:
             conn = self.connect_db()
             cursor = conn.cursor()
@@ -80,7 +82,7 @@ class SyncImg2DingTalk:
             for i in data.fetchall():
                 data_list.append(i[0])
             cursor.close()
-            self.logger.info(("search data count = {0}".format(len(data_list))))
+            # self.logger.info(("search data count = {0}".format(len(data_list))))
             return data_list
         except Exception as e:
             raise e
@@ -93,10 +95,10 @@ class SyncImg2DingTalk:
             conn = self.connect_db()
             cursor = conn.cursor()
             sql = update_temp.format(id, pic_url)
+            self.logger.info("update sql:" + sql)
             cursor.execute(sql)
             conn.commit()
             cursor.close()
-            self.logger.info("update data:" + sql)
         except Exception as e:
             self.logger.error("update data met error:" + e)
             raise e
@@ -131,41 +133,49 @@ class SyncImg2DingTalk:
             return time.strftime("%Y-%m-%d", time.localtime())
         return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
+    def encode_file(self, file_path):
+        m = hashlib.md5()
+        with open(file_path, 'rb') as f:
+            b641 = base64.b64encode(f.read())
+            return hashlib.md5(b641.decode().encode('utf-8')).hexdigest()
+
     def run(self):
         items = self.get_imgs_info(self.main_url)
-        self.logger.info("found mp images count= {0}".format(len(items)))
+        # self.logger.info("found mp images count= {0}".format(len(items)))
         for item in items:
+            self.logger.info("-*-" * 20 +'\n')
             if 'content' in item:
-                self.logger.warn("text type msg ignore")
+                self.logger.warning("** sync skip ** 'text' type msg ignore")
                 continue
             img_id = item.get('id')
             fake_id = item.get('fakeid')
             nick_name = item.get('nick_name')
-            self.logger.info("start sync image, info, img_id={0}, send_by={1}".format(img_id, nick_name))
+            self.logger.info("start sync image: img_id={0}, send_by={1}".format(img_id, nick_name))
 
             # 记录校验,微信有记录存在则不继续
-            find_img_id = self.search_log(img_id=img_id)
-            if (len(find_img_id)):
-                self.logger.warn("**job skip** find img_id with rowId ={0}".format(find_img_id))
+            record = self.search_log(img_id=img_id)
+            if (len(record)):
+                self.logger.warning("** job skip ** find img_id with rowId ={0}".format(record))
                 continue
 
             # 保存图片
             pic_path = self.save_image_2_local(img_id)
 
-            # 上传图片
-            pic_url = self.ttk.upload_file(pic_path)
-
-            # 记录校验,TTK有记录存在则不继续
-            find_pic_url = self.search_log(pic_url=pic_url)
-            if (len(find_pic_url)):
-                self.logger.warn("**job skip** find pic_url with rowId ={0}".format(find_pic_url))
+            # 记录校验,本地表情存在则不继续
+            encode_ = self.encode_file(pic_path)
+            record = self.search_log(encode=encode_)
+            if (len(record)):
+                self.logger.warning("** job skip ** find encode with rowId ={0}".format(record))
+                os.remove(pic_path)
                 continue
 
+            # 上传图片
+            pic_url = self.ttk.upload_file(pic_path)
             # 发送图片
             self.ding_hook.send_image(pic_url)
             self.logger.info("finished sync image, info, pic_path={0}, pic_path={1}".format(pic_path, pic_url))
             # 结果记录
-            self.insert_log(fake_id, img_id, nick_name, pic_url)
+            self.insert_log(fake_id, img_id, nick_name, encode_)
 
             # 删除图片节约空间
             if self.delete_pic:
@@ -173,5 +183,9 @@ class SyncImg2DingTalk:
 
 
 if __name__ == '__main__':
-    te = SyncImg2DingTalk()
-    te.run()
+    sy = SyncImg2DingTalk()
+    # print(sy.encode_file('./images/2020-10-31/500616174.jpeg'))
+    # print(sy.encode_file('./images/2020-10-31/500616174.jpeg'))
+    # print(sy.encode_file('./images/2020-10-31/500616174.jpeg'))
+    # print(sy.search_log(base64=sy.encode_file('./images/2020-10-31/500616174.jpeg')))
+    sy.run()
