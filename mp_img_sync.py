@@ -80,7 +80,8 @@ class SyncImg2DingTalk:
             cursor.close()
             self.cache[img_id] = encode
             self.logger.warning(
-                "send new img successfully, cache was updated! size = {0} bytes".format(sys.getsizeof(self.cache)))
+                "send new img successfully, img_id = {1}, cache was updated! size = {0} bytes"
+                    .format(sys.getsizeof(self.cache)), img_id)
         except Exception as e:
             self.logger.error("insert data met error:" + e)
             raise e
@@ -179,7 +180,7 @@ class SyncImg2DingTalk:
 
             # 记录校验,微信有记录存在则不继续
             if (self.is_exist(img_id=img_id)):
-                self.logger.info("** job skip ** find img_id  ={0}".format(img_id))
+                self.logger.info("sync process skipped,  find img_id  = {0} in sync_log".format(img_id))
                 continue
 
             # 保存图片
@@ -188,7 +189,8 @@ class SyncImg2DingTalk:
             # 记录校验,本地表情存在则不继续
             encode_ = self.encode_file(pic_path)
             if (self.is_exist(encode=encode_)):
-                self.logger.warning("found md5 collision when try to save img, img_id = {1},  md5 value = {0}".format(encode_, img_id))
+                self.logger.info(
+                    "found collision when try to save img, img_id = {1},  md5 value = {0}".format(encode_, img_id))
                 os.remove(pic_path)
                 continue
 
