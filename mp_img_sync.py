@@ -29,11 +29,31 @@ class SyncImg2DingTalk:
         # 贴图库 设置
         self.oss = ttk_client.TTKClient()
 
+        # 同步后是否删除本地图片
+        self.delete_pic = delete_pic
+
+        # 本地缓存加速
+        self.cache = {}
+
         # 初始化本地图片目录
         self.init_folder()
 
-        # 同步后是否删除本地图片
-        self.delete_pic = delete_pic
+        # 初始化缓存
+        self.init_cache()
+
+    def init_cache(self):
+        search_temp = "SELECT id, img_id, encode FROM mp_sync_log  "
+        try:
+            conn = self.connect_db()
+            cursor = conn.cursor()
+            data = cursor.execute(search_temp)
+            for i in data.fetchall():
+                self.cache[i[1]] = i[2]
+            cursor.close()
+        except Exception as e:
+            raise e
+        finally:
+            self.dis_connect_db()
 
     def init_folder(self):
         if not os.path.exists('./images'):
@@ -50,28 +70,32 @@ class SyncImg2DingTalk:
     def insert_log(self, fake_id, img_id, nick_name, encode):
         insert_temp = "INSERT INTO mp_sync_log(fake_id, img_id, nick_name, encode ,created_at) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}')"
         try:
-            conn = self.connect_db()
-            cursor = conn.cursor()
             sql = insert_temp.format(fake_id, img_id, nick_name, encode, self.now(False))
             self.logger.info("insert sql:" + sql)
+            conn = self.connect_db()
+            cursor = conn.cursor()
             cursor.execute(sql)
             conn.commit()
             cursor.close()
+            self.cache[img_id] = encode
         except Exception as e:
-            self.logger.error("isnert data met error:" + e)
+            self.logger.error("insert data met error:" + e)
             raise e
         finally:
             self.dis_connect_db()
 
-    def search_log(self, **kwargs):
-        data_list = []
-        search_temp = "SELECT * FROM mp_sync_log where 1 =1 "
-        if 'fake_id' in kwargs.keys():
-            search_temp += " AND fake_id = '{0}'".format(kwargs.get('fake_id'))
+    def is_exist(self, **kwargs):
+
+        if 'img_id' in kwargs.keys() and str(kwargs.get('img_id')) in self.cache.keys():
+            return True
+
+        if 'encode' in kwargs.keys() and kwargs.get('encode') in self.cache.keys():
+            return True
+
+        search_temp = "SELECT id, img_id, encode FROM mp_sync_log where 1 =1 "
+
         if 'img_id' in kwargs.keys():
             search_temp += " AND img_id = '{0}'".format(kwargs.get('img_id'))
-        if 'nick_name' in kwargs.keys():
-            search_temp += " AND nick_name = '{0}'".format(kwargs.get('nick_name'))
         if 'encode' in kwargs.keys():
             search_temp += " AND encode = '{0}'".format(kwargs.get('encode'))
         try:
@@ -79,22 +103,19 @@ class SyncImg2DingTalk:
             cursor = conn.cursor()
             self.logger.info("search sql:" + search_temp)
             data = cursor.execute(search_temp)
-            for i in data.fetchall():
-                data_list.append(i[0])
             cursor.close()
-            # self.logger.info(("search data count = {0}".format(len(data_list))))
-            return data_list
+            return True if len(data.fetchall()) else False
         except Exception as e:
             raise e
         finally:
             self.dis_connect_db()
 
-    def update_log(self, id, pic_url):
-        update_temp = "UPDATE mp_sync_log SET pic_url = '{1}' WHERE id = {0}"
+    def update_log(self, img_id, pic_url):
+        update_temp = "UPDATE mp_sync_log SET pic_url = '{1}' WHERE img_id = {0}"
         try:
             conn = self.connect_db()
             cursor = conn.cursor()
-            sql = update_temp.format(id, pic_url)
+            sql = update_temp.format(img_id, pic_url)
             self.logger.info("update sql:" + sql)
             cursor.execute(sql)
             conn.commit()
@@ -143,7 +164,7 @@ class SyncImg2DingTalk:
         items = self.get_imgs_info(self.main_url)
         # self.logger.info("found mp images count= {0}".format(len(items)))
         for item in items:
-            self.logger.info("-*-" * 20 +'\n')
+            self.logger.info("-*-" * 20 + '\n')
             if 'content' in item:
                 self.logger.warning("** sync skip ** 'text' type msg ignore")
                 continue
@@ -153,9 +174,8 @@ class SyncImg2DingTalk:
             self.logger.info("start sync image: img_id={0}, send_by={1}".format(img_id, nick_name))
 
             # 记录校验,微信有记录存在则不继续
-            record = self.search_log(img_id=img_id)
-            if (len(record)):
-                self.logger.warning("** job skip ** find img_id with rowId ={0}".format(record))
+            if (self.is_exist(img_id=img_id)):
+                self.logger.warning("** job skip ** find img_id  ={0}".format(img_id))
                 continue
 
             # 保存图片
@@ -163,9 +183,8 @@ class SyncImg2DingTalk:
 
             # 记录校验,本地表情存在则不继续
             encode_ = self.encode_file(pic_path)
-            record = self.search_log(encode=encode_)
-            if (len(record)):
-                self.logger.warning("** job skip ** find encode with rowId ={0}".format(record))
+            if (self.is_exist(encode=encode_)):
+                self.logger.warning("** job skip ** find encode ={0}".format(encode_))
                 os.remove(pic_path)
                 continue
 
