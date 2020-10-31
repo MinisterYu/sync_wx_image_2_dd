@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# _*_ coding:gbk _*_
+# -*- coding: gb2312 -*-
+# ! /usr/bin/env python
 
 import re
 import sys

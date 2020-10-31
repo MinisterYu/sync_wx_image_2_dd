@@ -1,5 +1,6 @@
-#! /usr/bin/env python
-# coding:gbk
+# -*- coding: gb2312 -*-
+# ! /usr/bin/env python
+
 import requests_toolbelt
 import requests
 import json

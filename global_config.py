@@ -1,5 +1,5 @@
-#! /usr/bin/env python
-# coding:gbk
+# -*- coding: gb2312 -*-
+# ! /usr/bin/env python
 import logging
 import os
 

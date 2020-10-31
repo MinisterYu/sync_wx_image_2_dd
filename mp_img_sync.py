@@ -188,7 +188,7 @@ class SyncImg2DingTalk:
             # 记录校验,本地表情存在则不继续
             encode_ = self.encode_file(pic_path)
             if (self.is_exist(encode=encode_)):
-                self.logger.info("** job skip ** find encode ={0}".format(encode_))
+                self.logger.warning("found md5 collision when try to save img, img_id = {1},  md5 value = {0}".format(encode_, img_id))
                 os.remove(pic_path)
                 continue
 
