@@ -27,7 +27,7 @@ class SyncImg2DingTalk:
         self.ding_hook = ding_chat_bot.DingtalkChatbot()
 
         # 贴图库 设置
-        self.ttk = ttk_client.TTKClient()
+        self.oss = ttk_client.TTKClient()
 
         # 初始化本地图片目录
         self.init_folder()
@@ -170,7 +170,7 @@ class SyncImg2DingTalk:
                 continue
 
             # 上传图片
-            pic_url = self.ttk.upload_file(pic_path)
+            pic_url = self.oss.upload_file(pic_path)
             # 发送图片
             self.ding_hook.send_image(pic_url)
             self.logger.info("finished sync image, info, pic_path={0}, pic_path={1}".format(pic_path, pic_url))
