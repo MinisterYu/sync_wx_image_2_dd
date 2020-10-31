@@ -68,10 +68,10 @@ class SyncImg2DingTalk:
     def dis_connect_db(self):
         self.conn.close()
 
-    def insert_log(self, fake_id, img_id, nick_name, encode):
-        insert_temp = "INSERT INTO mp_sync_log(fake_id, img_id, nick_name, encode ,created_at) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}')"
+    def insert_log(self, fake_id, img_id, nick_name, pic_url, encode):
+        insert_temp = "INSERT INTO mp_sync_log(fake_id, img_id, nick_name, pic_url, encode ,created_at) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}', '{5}')"
         try:
-            sql = insert_temp.format(fake_id, img_id, nick_name, encode, self.now(False))
+            sql = insert_temp.format(fake_id, img_id, nick_name, pic_url, encode, self.now(False))
             self.logger.info("insert sql:" + sql)
             conn = self.connect_db()
             cursor = conn.cursor()
@@ -81,7 +81,7 @@ class SyncImg2DingTalk:
             self.cache[img_id] = encode
             self.logger.warning(
                 "send new img successfully, img_id = {1}, cache was updated! size = {0} bytes"
-                    .format(sys.getsizeof(self.cache)), img_id)
+                    .format(sys.getsizeof(self.cache), img_id))
         except Exception as e:
             self.logger.error("insert data met error:" + e)
             raise e
@@ -200,7 +200,7 @@ class SyncImg2DingTalk:
             self.ding_hook.send_image(pic_url)
             self.logger.info("finished sync image, info, pic_path={0}, pic_path={1}".format(pic_path, pic_url))
             # 结果记录
-            self.insert_log(fake_id, img_id, nick_name, encode_)
+            self.insert_log(fake_id, img_id, nick_name, pic_url, encode_)
 
             # 删除图片节约空间
             if self.delete_pic:
