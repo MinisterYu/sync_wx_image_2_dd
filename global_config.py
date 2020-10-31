@@ -1,14 +1,14 @@
-# -*- coding: gb2312 -*-
+# -*- coding: gbk -*-
 # ! /usr/bin/env python
 import logging
 import os
 
 # 微信公众号配置
 # 登录 cookies  -- 每次修改
-COOKIES = "ua_id=Ho4hzV3FnR1ZB8DBAAAAAAAuGpEMu1UOgOsf4wmGqao=; pgv_pvi=7355956224; pgv_si=s9599310848; openid2ticket_oY5mC09S3gI6H3tkJng-5UHieeH4=5IzHfMP5rXARynd0gboi+z7JoVpTVRsC+30o0DsMNmM=; mm_lang=zh_CN; ptui_loginuin=173682166@qq.com; uin=o0173682166; skey=@ndxQordgT; RK=gI5syesGOY; ptcz=f8b4b8616467301a9d857022e184852c6c8220aaf5ffe75728d3f52db37197f4; uuid=e46620edefc79d640e731afd89e8174d; rand_info=CAESIGSTV/kdwaKQZ+NqGKzuJB4/xkQE9LYkaHBgBeA5yUpB; slave_bizuin=3594344901; data_bizuin=3548551523; bizuin=3594344901; data_ticket=o6g3vGFPtSLYO4AB78Ij+JMdfoY5DjY50cZS8iZg07cZOHfb42w1KlK9rh0kxsG4; slave_sid=V1ltMTFaWVRpdEUyR1pUVEk4SEtPcnRzcnlBVE9NTGp5b0ZRVW5vMzcxbTNpRzB1eU1tZEdMZEx2b2RDM1NBbHRiYmY3SzZ2amhDSDR1d2JUOGllZ191RFJvTG9FRjlqOTJ5WGxlRXBsODlkRXc0aU9xNXgzN0l1dVp3dW5hcjJIQk9ORW9IWm9CR2MxU1B3; slave_user=gh_46235149cb45; xid=d9eeef70d4628b5e41c7d31092c6ba02"
+COOKIES = "ua_id=Ho4hzV3FnR1ZB8DBAAAAAAAuGpEMu1UOgOsf4wmGqao=; pgv_pvi=7355956224; pgv_si=s9599310848; openid2ticket_oY5mC09S3gI6H3tkJng-5UHieeH4=5IzHfMP5rXARynd0gboi+z7JoVpTVRsC+30o0DsMNmM=; mm_lang=zh_CN; ptui_loginuin=173682166@qq.com; uin=o0173682166; skey=@ndxQordgT; RK=gI5syesGOY; ptcz=f8b4b8616467301a9d857022e184852c6c8220aaf5ffe75728d3f52db37197f4; media_ticket=558a0eca40e65b7b69cc18137d1ef547934cfbb1; media_ticket_id=3594344901; sig=h01fe93019a83854831be24877c006d39121dbf06a5108e4ebb85f400664b1d5fbe01a382f8e6419802; uuid=96cc27ad1cbcd1c81d1e5f6eeacccedf; rand_info=CAESIKEIOuB8dQ5AS+QcnL+UP4Sjm5QDx0VtIeOIJloRh9Sv; slave_bizuin=3594344901; data_bizuin=3548551523; bizuin=3594344901; data_ticket=WJrHpoM2C709CK8xJtPWyZZ8VGa2zb9u0tiIz8agEVt32672L+JthUk0wFhT9+FJ; slave_sid=cnhkRkJSU1lrdzJtOUNDR0VUZXlTdnVrWGxtX1RGTnZMang0VFMydHVCeHRtR01ZR0I2R1JHZ2VWTWl1NDl1dEtrMEN3QVdyZDNZWmRyYkNFeEdWVFRVUUdiM1dCXzRZYzJmbGxNcDF3c2RISDI2b1I0OE9yUzJPdzJrR0szd2FGTmxSRnZBZDhJWjN1UGto; slave_user=gh_46235149cb45; xid=16a55d845e2e257dd9e2f701dbc8e73b"
 
 # 登录token  -- 每次修改
-MP_TOKEN = '1463668875'
+MP_TOKEN = '1494544130'
 
 # 后台地址
 MP_URL = "https://mp.weixin.qq.com/cgi-bin/message?t=message/list&count={0}&day={1}&filtertype=0&filterivrmsg=1&filterspammsg=1&token={2}&lang=zh_CN" \
@@ -26,21 +26,25 @@ MP_HEADERS = {'authority': 'mp.weixin.qq.com',
 
 # ----------------------------------------------------
 
-# TTK 配置
+# OSS 配置
 # 上传接口
-TTK_URL = "http://up.imgapi.com/"
+MS_BASE_URL = "https://sm.ms/api/v2/"
 
-# 上传图册的TOKEN，参考 http://www.tietuku.com/manager/createtoken
-TTK_TOKEN = "9c7bf21edf08008e7cdb146aaba373de53c1fa74:K8CuBPEMlao_k3x1YOP9vOoWiMg=:eyJkZWFkbGluZSI6MTYwNDA3MDIwNiwiYWN0aW9uIjoiZ2V0IiwidWlkIjoiNzI5MDAzIiwiYWlkIjoiMTcyNjg1NiIsImZyb20iOiJmaWxlIn0="
+# 上传图册的TOKEN
+MS_TOKEN = "eoYPfJquYqFwibyRFLRksxaFSuWK2cC2"
 
 # 请求header
-TTK_HEADERS = {
+MS_HEADERS = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'zh-CN,zh;q=0.9',
     'Connection': 'keep-alive',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36'
+    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
+    'Authorization': MS_TOKEN
 }
+
+#轮训时间
+INTERVAL_TIME = 30
 
 # ----------------------------------------------------
 
@@ -60,6 +64,6 @@ DING_SECRET = 'SEC4d8e90ce12b9e3d9dc7b496200c857d4dd065d2008ece7254c5b799b8b8808
 DB_CONFIG = os.path.abspath("./sync_log.db")
 
 # 日志
-logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 logger = logging.getLogger()

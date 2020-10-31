@@ -3,13 +3,13 @@
 import mp_img_sync
 from apscheduler.schedulers.background import BlockingScheduler
 from apscheduler.events import EVENT_JOB_ERROR
-from global_config import logger
+from global_config import logger, INTERVAL_TIME
 
 
 class Scheduler:
 
     # 间隔时间不宜设置太短，否则任务会存在跳过情况：http://www.debug5.com/detail/474/
-    def __init__(self, inertval=30):
+    def __init__(self, inertval=INTERVAL_TIME):
         self.scheduler = BlockingScheduler()
         self.inertval = inertval
 

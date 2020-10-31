@@ -4,14 +4,14 @@ import requests
 import re
 import json
 import time
-import sqlite3
 import os
 import ding_chat_bot
-import ttk_client
+import oss_client
 import global_config
 import base64
 import hashlib
 import sys
+import db_client
 
 
 class SyncImg2DingTalk:
@@ -24,11 +24,14 @@ class SyncImg2DingTalk:
         self.headers = global_config.MP_HEADERS
         self.img_url_temp = 'https://mp.weixin.qq.com/cgi-bin/getimgdata?token=' + global_config.MP_TOKEN + '&msgid={0}&mode=small&source=&fileId=0&ow=-1'
 
+        # db
+        self.db = db_client.DBClient()
+
         # ding hook 设置
         self.ding_hook = ding_chat_bot.DingtalkChatbot()
 
         # 贴图库 设置
-        self.oss = ttk_client.TTKClient()
+        self.oss = oss_client.OSSClient()
 
         # 同步后是否删除本地图片
         self.delete_pic = delete_pic
@@ -44,49 +47,27 @@ class SyncImg2DingTalk:
 
     def init_cache(self):
         search_temp = "SELECT id, img_id, encode FROM mp_sync_log  "
-        try:
-            conn = self.connect_db()
-            cursor = conn.cursor()
-            data = cursor.execute(search_temp)
-            for i in data.fetchall():
-                self.cache[i[1]] = i[2]
-            cursor.close()
-        except Exception as e:
-            raise e
-        finally:
-            self.dis_connect_db()
+        data = self.db.do_query(search_temp)
+        for i in data:
+            self.cache[i[1]] = i[2]
 
     def init_folder(self):
         if not os.path.exists('./images'):
             os.mkdir('images')
 
-    def connect_db(self):
-        # sqlite3 设置
-        self.conn = sqlite3.connect(global_config.DB_CONFIG, check_same_thread=False)
-        return self.conn
-
-    def dis_connect_db(self):
-        self.conn.close()
-
     def insert_log(self, fake_id, img_id, nick_name, pic_url, encode):
         insert_temp = "INSERT INTO mp_sync_log(fake_id, img_id, nick_name, pic_url, encode ,created_at) VALUES ( '{0}', '{1}', '{2}', '{3}', '{4}', '{5}')"
-        try:
-            sql = insert_temp.format(fake_id, img_id, nick_name, pic_url, encode, self.now(False))
-            self.logger.info("insert sql:" + sql)
-            conn = self.connect_db()
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            conn.commit()
-            cursor.close()
-            self.cache[img_id] = encode
-            self.logger.warning(
-                "send new img successfully, img_id = {1}, cache was updated! size = {0} bytes"
-                    .format(sys.getsizeof(self.cache), img_id))
-        except Exception as e:
-            self.logger.error("insert data met error:" + e)
-            raise e
-        finally:
-            self.dis_connect_db()
+
+        sql = insert_temp.format(fake_id, img_id, nick_name, pic_url, encode, self.now(False))
+
+        self.logger.info("insert sql:" + sql)
+
+        self.db.do_insert(sql)
+
+        self.cache[img_id] = encode
+
+        self.logger.warning("send new img successfully, img_id = {1}, cache was updated! size = {0} bytes"
+                            .format(sys.getsizeof(self.cache), img_id))
 
     def is_exist(self, **kwargs):
 
@@ -100,36 +81,15 @@ class SyncImg2DingTalk:
 
         if 'img_id' in kwargs.keys():
             search_temp += " AND img_id = '{0}'".format(kwargs.get('img_id'))
+
         if 'encode' in kwargs.keys():
             search_temp += " AND encode = '{0}'".format(kwargs.get('encode'))
-        try:
-            conn = self.connect_db()
-            cursor = conn.cursor()
-            self.logger.info("search sql:" + search_temp)
-            data = cursor.execute(search_temp)
-            found = True if len(data.fetchall()) else False
-            cursor.close()
-            return found
-        except Exception as e:
-            raise e
-        finally:
-            self.dis_connect_db()
 
-    def update_log(self, img_id, pic_url):
-        update_temp = "UPDATE mp_sync_log SET pic_url = '{1}' WHERE img_id = {0}"
-        try:
-            conn = self.connect_db()
-            cursor = conn.cursor()
-            sql = update_temp.format(img_id, pic_url)
-            self.logger.info("update sql:" + sql)
-            cursor.execute(sql)
-            conn.commit()
-            cursor.close()
-        except Exception as e:
-            self.logger.error("update data met error:" + e)
-            raise e
-        finally:
-            self.dis_connect_db()
+        self.logger.info("search sql:" + search_temp)
+
+        data = self.db.do_query(search_temp)
+
+        return True if len(data) else False
 
     def load_image_from_mp(self, img_id):
         pic_url = self.img_url_temp.format(img_id)
@@ -195,7 +155,12 @@ class SyncImg2DingTalk:
                 continue
 
             # 上传图片
-            pic_url = self.oss.upload_file(pic_path)
+            pic_url = self.oss.upload(pic_path)
+            self.logger.info("pic_url= " + pic_url)
+            if not pic_url:
+                self.logger.error("upload pic = {0} to oss response is null".format(pic_path))
+                continue
+
             # 发送图片
             self.ding_hook.send_image(pic_url)
             self.logger.info("finished sync image, info, pic_path={0}, pic_path={1}".format(pic_path, pic_url))
