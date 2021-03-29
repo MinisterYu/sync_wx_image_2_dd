@@ -1,4 +1,4 @@
-# -*- coding: gb2312 -*-
+# -*- coding: utf-8 -*-
 # ! /usr/bin/env python
 
 import re
@@ -30,9 +30,9 @@ except AttributeError:
 
 def is_not_null_and_blank_str(content):
     """
-    ·Ç¿Õ×Ö·û´®
-    :param content: ×Ö·û´®
-    :return: ·Ç¿Õ - True£¬¿Õ - False
+    éç©ºå­—ç¬¦ä¸²
+    :param content: å­—ç¬¦ä¸²
+    :return: éç©º - Trueï¼Œç©º - False
 
     >>> is_not_null_and_blank_str('')
     False
@@ -51,33 +51,33 @@ def is_not_null_and_blank_str(content):
 
 class DingtalkChatbot(object):
     """
-    ¶¤¶¤Èº×Ô¶¨Òå»úÆ÷ÈË£¨Ã¿¸ö»úÆ÷ÈËÃ¿·ÖÖÓ×î¶à·¢ËÍ20Ìõ£©£¬Ö§³ÖÎÄ±¾£¨text£©¡¢Á¬½Ó£¨link£©¡¢markdownÈıÖÖÏûÏ¢ÀàĞÍ£¡
+    é’‰é’‰ç¾¤è‡ªå®šä¹‰æœºå™¨äººï¼ˆæ¯ä¸ªæœºå™¨äººæ¯åˆ†é’Ÿæœ€å¤šå‘é€20æ¡ï¼‰ï¼Œæ”¯æŒæ–‡æœ¬ï¼ˆtextï¼‰ã€è¿æ¥ï¼ˆlinkï¼‰ã€markdownä¸‰ç§æ¶ˆæ¯ç±»å‹ï¼
     """
 
     def __init__(self, webhook=None, secret=None, pc_slide=False, fail_notice=False):
         """
-        »úÆ÷ÈË³õÊ¼»¯
-        :param webhook: ¶¤¶¤Èº×Ô¶¨Òå»úÆ÷ÈËwebhookµØÖ·
-        :param secret: »úÆ÷ÈË°²È«ÉèÖÃÒ³Ãæ¹´Ñ¡¡°¼ÓÇ©¡±Ê±ĞèÒª´«ÈëµÄÃÜÔ¿
-        :param pc_slide: ÏûÏ¢Á´½Ó´ò¿ª·½Ê½£¬Ä¬ÈÏFalseÎªä¯ÀÀÆ÷´ò¿ª£¬ÉèÖÃÎªTrueÊ±ÎªPC¶Ë²à±ßÀ¸´ò¿ª
-        :param fail_notice: ÏûÏ¢·¢ËÍÊ§°ÜÌáĞÑ£¬Ä¬ÈÏÎªFalse²»ÌáĞÑ£¬¿ª·¢Õß¿ÉÒÔ¸ù¾İ·µ»ØµÄÏûÏ¢·¢ËÍ½á¹û×ÔĞĞÅĞ¶ÏºÍ´¦Àí
+        æœºå™¨äººåˆå§‹åŒ–
+        :param webhook: é’‰é’‰ç¾¤è‡ªå®šä¹‰æœºå™¨äººwebhookåœ°å€
+        :param secret: æœºå™¨äººå®‰å…¨è®¾ç½®é¡µé¢å‹¾é€‰â€œåŠ ç­¾â€æ—¶éœ€è¦ä¼ å…¥çš„å¯†é’¥
+        :param pc_slide: æ¶ˆæ¯é“¾æ¥æ‰“å¼€æ–¹å¼ï¼Œé»˜è®¤Falseä¸ºæµè§ˆå™¨æ‰“å¼€ï¼Œè®¾ç½®ä¸ºTrueæ—¶ä¸ºPCç«¯ä¾§è¾¹æ æ‰“å¼€
+        :param fail_notice: æ¶ˆæ¯å‘é€å¤±è´¥æé†’ï¼Œé»˜è®¤ä¸ºFalseä¸æé†’ï¼Œå¼€å‘è€…å¯ä»¥æ ¹æ®è¿”å›çš„æ¶ˆæ¯å‘é€ç»“æœè‡ªè¡Œåˆ¤æ–­å’Œå¤„ç†
         """
         super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
-        self.queue = queue.Queue(20)  # ¶¤¶¤¹Ù·½ÏŞÁ÷Ã¿·ÖÖÓ·¢ËÍ20ÌõĞÅÏ¢
-        # ³õÊ¼»¯Éè¶¨¡¶²»ÈçÌøÎè¡·Èº»úÆ÷ÈËsiriÅäÖÃ
+        self.queue = queue.Queue(20)  # é’‰é’‰å®˜æ–¹é™æµæ¯åˆ†é’Ÿå‘é€20æ¡ä¿¡æ¯
+        # åˆå§‹åŒ–è®¾å®šã€Šä¸å¦‚è·³èˆã€‹ç¾¤æœºå™¨äººsirié…ç½®
         self.webhook = global_config.DING_WEBHOOK
         self.secret = global_config.DING_SECRET
 
         self.pc_slide = pc_slide
         self.fail_notice = fail_notice
-        self.start_time = time.time()  # ¼ÓÇ©Ê±£¬ÇëÇóÊ±¼ä´ÁÓëÇëÇóÊ±¼ä²»ÄÜ³¬¹ı1Ğ¡Ê±£¬ÓÃÓÚ¶¨Ê±¸üĞÂÇ©Ãû
+        self.start_time = time.time()  # åŠ ç­¾æ—¶ï¼Œè¯·æ±‚æ—¶é—´æˆ³ä¸è¯·æ±‚æ—¶é—´ä¸èƒ½è¶…è¿‡1å°æ—¶ï¼Œç”¨äºå®šæ—¶æ›´æ–°ç­¾å
         if self.secret is not None and self.secret.startswith('SEC'):
             self.update_webhook()
 
     def update_webhook(self):
         """
-        ¶¤¶¤Èº×Ô¶¨Òå»úÆ÷ÈË°²È«ÉèÖÃ¼ÓÇ©Ê±£¬Ç©ÃûÖĞµÄÊ±¼ä´ÁÓëÇëÇóÊ±²»ÄÜ³¬¹ıÒ»¸öĞ¡Ê±£¬ËùÒÔÃ¿¸ö1Ğ¡Ê±ĞèÒª¸üĞÂÇ©Ãû
+        é’‰é’‰ç¾¤è‡ªå®šä¹‰æœºå™¨äººå®‰å…¨è®¾ç½®åŠ ç­¾æ—¶ï¼Œç­¾åä¸­çš„æ—¶é—´æˆ³ä¸è¯·æ±‚æ—¶ä¸èƒ½è¶…è¿‡ä¸€ä¸ªå°æ—¶ï¼Œæ‰€ä»¥æ¯ä¸ª1å°æ—¶éœ€è¦æ›´æ–°ç­¾å
         """
         if is_py3:
             timestamp = round(self.start_time * 1000)
@@ -95,9 +95,9 @@ class DingtalkChatbot(object):
 
     def msg_open_type(self, url):
         """
-        ÏûÏ¢Á´½ÓµÄ´ò¿ª·½Ê½
-        1¡¢Ä¬ÈÏ»ò²»ÉèÖÃÊ±£¬Îªä¯ÀÀÆ÷´ò¿ª£ºpc_slide=False
-        2¡¢ÔÚPC¶Ë²à±ßÀ¸´ò¿ª£ºpc_slide=True
+        æ¶ˆæ¯é“¾æ¥çš„æ‰“å¼€æ–¹å¼
+        1ã€é»˜è®¤æˆ–ä¸è®¾ç½®æ—¶ï¼Œä¸ºæµè§ˆå™¨æ‰“å¼€ï¼špc_slide=False
+        2ã€åœ¨PCç«¯ä¾§è¾¹æ æ‰“å¼€ï¼špc_slide=True
         """
         encode_url = quote_plus(url)
         if self.pc_slide:
@@ -108,20 +108,20 @@ class DingtalkChatbot(object):
 
     def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True):
         """
-        textÀàĞÍ
-        :param msg: ÏûÏ¢ÄÚÈİ
-        :param is_at_all: @ËùÓĞÈËÊ±£ºtrue£¬·ñÔòÎªfalse£¨¿ÉÑ¡£©
-        :param at_mobiles: ±»@ÈËµÄÊÖ»úºÅ£¨×¢Òâ£º¿ÉÒÔÔÚmsgÄÚÈİÀï×Ô¶¨Òå@ÊÖ»úºÅµÄÎ»ÖÃ£¬Ò²Ö§³ÖÍ¬Ê±@¶à¸öÊÖ»úºÅ£¬¿ÉÑ¡£©
-        :param at_dingtalk_ids: ±»@ÈËµÄdingtalkId£¨¿ÉÑ¡£©
-        :param is_auto_at: ÊÇ·ñ×Ô¶¯ÔÚmsgÄÚÈİÄ©Î²Ìí¼Ó@ÊÖ»úºÅ£¬Ä¬ÈÏ×Ô¶¯Ìí¼Ó£¬¿ÉÉèÖÃÎªFalseÈ¡Ïû£¨¿ÉÑ¡£©
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        textç±»å‹
+        :param msg: æ¶ˆæ¯å†…å®¹
+        :param is_at_all: @æ‰€æœ‰äººæ—¶ï¼štrueï¼Œå¦åˆ™ä¸ºfalseï¼ˆå¯é€‰ï¼‰
+        :param at_mobiles: è¢«@äººçš„æ‰‹æœºå·ï¼ˆæ³¨æ„ï¼šå¯ä»¥åœ¨msgå†…å®¹é‡Œè‡ªå®šä¹‰@æ‰‹æœºå·çš„ä½ç½®ï¼Œä¹Ÿæ”¯æŒåŒæ—¶@å¤šä¸ªæ‰‹æœºå·ï¼Œå¯é€‰ï¼‰
+        :param at_dingtalk_ids: è¢«@äººçš„dingtalkIdï¼ˆå¯é€‰ï¼‰
+        :param is_auto_at: æ˜¯å¦è‡ªåŠ¨åœ¨msgå†…å®¹æœ«å°¾æ·»åŠ @æ‰‹æœºå·ï¼Œé»˜è®¤è‡ªåŠ¨æ·»åŠ ï¼Œå¯è®¾ç½®ä¸ºFalseå–æ¶ˆï¼ˆå¯é€‰ï¼‰
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
         """
         data = {"msgtype": "text", "at": {}}
         if is_not_null_and_blank_str(msg):
             data["text"] = {"content": msg}
         else:
-            logging.error("textÀàĞÍ£¬ÏûÏ¢ÄÚÈİ²»ÄÜÎª¿Õ£¡")
-            raise ValueError("textÀàĞÍ£¬ÏûÏ¢ÄÚÈİ²»ÄÜÎª¿Õ£¡")
+            logging.error("textç±»å‹ï¼Œæ¶ˆæ¯å†…å®¹ä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("textç±»å‹ï¼Œæ¶ˆæ¯å†…å®¹ä¸èƒ½ä¸ºç©ºï¼")
 
         if is_at_all:
             data["at"]["isAtAll"] = is_at_all
@@ -137,14 +137,14 @@ class DingtalkChatbot(object):
             at_dingtalk_ids = list(map(str, at_dingtalk_ids))
             data["at"]["atDingtalkIds"] = at_dingtalk_ids
 
-        logging.debug('textÀàĞÍ£º%s' % data)
+        logging.debug('textç±»å‹ï¼š%s' % data)
         return self.post(data)
 
     def send_image(self, pic_url):
         """
-        imageÀàĞÍ£¨±íÇé£©
-        :param pic_url: Í¼Æ¬Á´½Ó
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        imageç±»å‹ï¼ˆè¡¨æƒ…ï¼‰
+        :param pic_url: å›¾ç‰‡é“¾æ¥
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
         """
         if is_not_null_and_blank_str(pic_url):
             data = {
@@ -153,20 +153,20 @@ class DingtalkChatbot(object):
                     "picURL": pic_url
                 }
             }
-            logging.debug('imageÀàĞÍ£º%s' % data)
+            logging.debug('imageç±»å‹ï¼š%s' % data)
             return self.post(data)
         else:
-            logging.error("imageÀàĞÍÖĞÍ¼Æ¬Á´½Ó²»ÄÜÎª¿Õ£¡")
-            raise ValueError("imageÀàĞÍÖĞÍ¼Æ¬Á´½Ó²»ÄÜÎª¿Õ£¡")
+            logging.error("imageç±»å‹ä¸­å›¾ç‰‡é“¾æ¥ä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("imageç±»å‹ä¸­å›¾ç‰‡é“¾æ¥ä¸èƒ½ä¸ºç©ºï¼")
 
     def send_link(self, title, text, message_url, pic_url=''):
         """
-        linkÀàĞÍ
-        :param title: ÏûÏ¢±êÌâ
-        :param text: ÏûÏ¢ÄÚÈİ£¨Èç¹ûÌ«³¤×Ô¶¯Ê¡ÂÔÏÔÊ¾£©
-        :param message_url: µã»÷ÏûÏ¢´¥·¢µÄURL
-        :param pic_url: Í¼Æ¬URL£¨¿ÉÑ¡£©
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        linkç±»å‹
+        :param title: æ¶ˆæ¯æ ‡é¢˜
+        :param text: æ¶ˆæ¯å†…å®¹ï¼ˆå¦‚æœå¤ªé•¿è‡ªåŠ¨çœç•¥æ˜¾ç¤ºï¼‰
+        :param message_url: ç‚¹å‡»æ¶ˆæ¯è§¦å‘çš„URL
+        :param pic_url: å›¾ç‰‡URLï¼ˆå¯é€‰ï¼‰
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
 
         """
         if all(map(is_not_null_and_blank_str, [title, text, message_url])):
@@ -179,25 +179,25 @@ class DingtalkChatbot(object):
                     "messageUrl": self.msg_open_type(message_url)
                 }
             }
-            logging.debug('linkÀàĞÍ£º%s' % data)
+            logging.debug('linkç±»å‹ï¼š%s' % data)
             return self.post(data)
         else:
-            logging.error("linkÀàĞÍÖĞÏûÏ¢±êÌâ»òÄÚÈİ»òÁ´½Ó²»ÄÜÎª¿Õ£¡")
-            raise ValueError("linkÀàĞÍÖĞÏûÏ¢±êÌâ»òÄÚÈİ»òÁ´½Ó²»ÄÜÎª¿Õ£¡")
+            logging.error("linkç±»å‹ä¸­æ¶ˆæ¯æ ‡é¢˜æˆ–å†…å®¹æˆ–é“¾æ¥ä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("linkç±»å‹ä¸­æ¶ˆæ¯æ ‡é¢˜æˆ–å†…å®¹æˆ–é“¾æ¥ä¸èƒ½ä¸ºç©ºï¼")
 
     def send_markdown(self, title, text, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True):
         """
-        markdownÀàĞÍ
-        :param title: Ê×ÆÁ»á»°Í¸³öµÄÕ¹Ê¾ÄÚÈİ
-        :param text: markdown¸ñÊ½µÄÏûÏ¢ÄÚÈİ
-        :param is_at_all: @ËùÓĞÈËÊ±£ºtrue£¬·ñÔòÎª£ºfalse£¨¿ÉÑ¡£©
-        :param at_mobiles: ±»@ÈËµÄÊÖ»úºÅ£¨Ä¬ÈÏ×Ô¶¯Ìí¼ÓÔÚtextÄÚÈİÄ©Î²£¬¿ÉÈ¡Ïû×Ô¶¯»¯Ìí¼Ó¸ÄÎª×Ô¶¨ÒåÉèÖÃ£¬¿ÉÑ¡£©
-        :param at_dingtalk_ids: ±»@ÈËµÄdingtalkId£¨¿ÉÑ¡£©
-        :param is_auto_at: ÊÇ·ñ×Ô¶¯ÔÚtextÄÚÈİÄ©Î²Ìí¼Ó@ÊÖ»úºÅ£¬Ä¬ÈÏ×Ô¶¯Ìí¼Ó£¬¿ÉÉèÖÃÎªFalseÈ¡Ïû£¨¿ÉÑ¡£©        
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        markdownç±»å‹
+        :param title: é¦–å±ä¼šè¯é€å‡ºçš„å±•ç¤ºå†…å®¹
+        :param text: markdownæ ¼å¼çš„æ¶ˆæ¯å†…å®¹
+        :param is_at_all: @æ‰€æœ‰äººæ—¶ï¼štrueï¼Œå¦åˆ™ä¸ºï¼šfalseï¼ˆå¯é€‰ï¼‰
+        :param at_mobiles: è¢«@äººçš„æ‰‹æœºå·ï¼ˆé»˜è®¤è‡ªåŠ¨æ·»åŠ åœ¨textå†…å®¹æœ«å°¾ï¼Œå¯å–æ¶ˆè‡ªåŠ¨åŒ–æ·»åŠ æ”¹ä¸ºè‡ªå®šä¹‰è®¾ç½®ï¼Œå¯é€‰ï¼‰
+        :param at_dingtalk_ids: è¢«@äººçš„dingtalkIdï¼ˆå¯é€‰ï¼‰
+        :param is_auto_at: æ˜¯å¦è‡ªåŠ¨åœ¨textå†…å®¹æœ«å°¾æ·»åŠ @æ‰‹æœºå·ï¼Œé»˜è®¤è‡ªåŠ¨æ·»åŠ ï¼Œå¯è®¾ç½®ä¸ºFalseå–æ¶ˆï¼ˆå¯é€‰ï¼‰        
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
         """
         if all(map(is_not_null_and_blank_str, [title, text])):
-            # ¸øMardownÎÄ±¾ÏûÏ¢ÖĞµÄÌø×ªÁ´½ÓÌí¼ÓÉÏÌø×ª·½Ê½
+            # ç»™Mardownæ–‡æœ¬æ¶ˆæ¯ä¸­çš„è·³è½¬é“¾æ¥æ·»åŠ ä¸Šè·³è½¬æ–¹å¼
             text = re.sub(r'(?<!!)\[.*?\]\((.*?)\)',
                           lambda m: m.group(0).replace(m.group(1), self.msg_open_type(m.group(1))), text)
             data = {
@@ -222,17 +222,17 @@ class DingtalkChatbot(object):
                 at_dingtalk_ids = list(map(str, at_dingtalk_ids))
                 data["at"]["atDingtalkIds"] = at_dingtalk_ids
 
-            logging.debug("markdownÀàĞÍ£º%s" % data)
+            logging.debug("markdownç±»å‹ï¼š%s" % data)
             return self.post(data)
         else:
-            logging.error("markdownÀàĞÍÖĞÏûÏ¢±êÌâ»òÄÚÈİ²»ÄÜÎª¿Õ£¡")
-            raise ValueError("markdownÀàĞÍÖĞÏûÏ¢±êÌâ»òÄÚÈİ²»ÄÜÎª¿Õ£¡")
+            logging.error("markdownç±»å‹ä¸­æ¶ˆæ¯æ ‡é¢˜æˆ–å†…å®¹ä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("markdownç±»å‹ä¸­æ¶ˆæ¯æ ‡é¢˜æˆ–å†…å®¹ä¸èƒ½ä¸ºç©ºï¼")
 
     def send_action_card(self, action_card):
         """
-        ActionCardÀàĞÍ
-        :param action_card: ÕûÌåÌø×ªActionCardÀàĞÍÊµÀı»ò¶ÀÁ¢Ìø×ªActionCardÀàĞÍÊµÀı
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        ActionCardç±»å‹
+        :param action_card: æ•´ä½“è·³è½¬ActionCardç±»å‹å®ä¾‹æˆ–ç‹¬ç«‹è·³è½¬ActionCardç±»å‹å®ä¾‹
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
         """
         if isinstance(action_card, ActionCard):
             data = action_card.get_data()
@@ -243,113 +243,113 @@ class DingtalkChatbot(object):
                 for btn in data["actionCard"]["btns"]:
                     btn["actionURL"] = self.msg_open_type(btn["actionURL"])
 
-            logging.debug("ActionCardÀàĞÍ£º%s" % data)
+            logging.debug("ActionCardç±»å‹ï¼š%s" % data)
             return self.post(data)
         else:
-            logging.error("ActionCardÀàĞÍ£º´«ÈëµÄÊµÀıÀàĞÍ²»ÕıÈ·£¬ÄÚÈİÎª£º{}".format(str(action_card)))
-            raise TypeError("ActionCardÀàĞÍ£º´«ÈëµÄÊµÀıÀàĞÍ²»ÕıÈ·£¬ÄÚÈİÎª£º{}".format(str(action_card)))
+            logging.error("ActionCardç±»å‹ï¼šä¼ å…¥çš„å®ä¾‹ç±»å‹ä¸æ­£ç¡®ï¼Œå†…å®¹ä¸ºï¼š{}".format(str(action_card)))
+            raise TypeError("ActionCardç±»å‹ï¼šä¼ å…¥çš„å®ä¾‹ç±»å‹ä¸æ­£ç¡®ï¼Œå†…å®¹ä¸ºï¼š{}".format(str(action_card)))
 
     def send_feed_card(self, links):
         """
-        FeedCardÀàĞÍ
-        :param links: FeedLinkÊµÀıÁĞ±í or CardItemÊµÀıÁĞ±í
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        FeedCardç±»å‹
+        :param links: FeedLinkå®ä¾‹åˆ—è¡¨ or CardItemå®ä¾‹åˆ—è¡¨
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
         """
         if not isinstance(links, list):
-            logging.error("FeedLinkÀàĞÍ£º´«ÈëµÄÊı¾İ¸ñÊ½²»ÕıÈ·£¬ÄÚÈİÎª£º{}".format(str(links)))
-            raise ValueError("FeedLinkÀàĞÍ£º´«ÈëµÄÊı¾İ¸ñÊ½²»ÕıÈ·£¬ÄÚÈİÎª£º{}".format(str(links)))
+            logging.error("FeedLinkç±»å‹ï¼šä¼ å…¥çš„æ•°æ®æ ¼å¼ä¸æ­£ç¡®ï¼Œå†…å®¹ä¸ºï¼š{}".format(str(links)))
+            raise ValueError("FeedLinkç±»å‹ï¼šä¼ å…¥çš„æ•°æ®æ ¼å¼ä¸æ­£ç¡®ï¼Œå†…å®¹ä¸ºï¼š{}".format(str(links)))
 
         link_list = []
         for link in links:
-            # ¼æÈİ£º1¡¢´«ÈëFeedLinkÊµÀıÁĞ±í£»2¡¢CardItemÊµÀıÁĞ±í£»
+            # å…¼å®¹ï¼š1ã€ä¼ å…¥FeedLinkå®ä¾‹åˆ—è¡¨ï¼›2ã€CardItemå®ä¾‹åˆ—è¡¨ï¼›
             if isinstance(link, FeedLink) or isinstance(link, CardItem):
                 link = link.get_data()
                 link['messageURL'] = self.msg_open_type(link['messageURL'])
                 link_list.append(link)
             else:
-                logging.error("FeedLinkÀàĞÍ£¬´«ÈëµÄÊı¾İ¸ñÊ½²»ÕıÈ·£¬ÄÚÈİÎª£º{}".format(str(link)))
-                raise ValueError("FeedLinkÀàĞÍ£¬´«ÈëµÄÊı¾İ¸ñÊ½²»ÕıÈ·£¬ÄÚÈİÎª£º{}".format(str(link)))
+                logging.error("FeedLinkç±»å‹ï¼Œä¼ å…¥çš„æ•°æ®æ ¼å¼ä¸æ­£ç¡®ï¼Œå†…å®¹ä¸ºï¼š{}".format(str(link)))
+                raise ValueError("FeedLinkç±»å‹ï¼Œä¼ å…¥çš„æ•°æ®æ ¼å¼ä¸æ­£ç¡®ï¼Œå†…å®¹ä¸ºï¼š{}".format(str(link)))
 
         data = {"msgtype": "feedCard", "feedCard": {"links": link_list}}
-        logging.debug("FeedCardÀàĞÍ£º%s" % data)
+        logging.debug("FeedCardç±»å‹ï¼š%s" % data)
         return self.post(data)
 
     def post(self, data):
         """
-        ·¢ËÍÏûÏ¢£¨ÄÚÈİUTF-8±àÂë£©
-        :param data: ÏûÏ¢Êı¾İ£¨×Öµä£©
-        :return: ·µ»ØÏûÏ¢·¢ËÍ½á¹û
+        å‘é€æ¶ˆæ¯ï¼ˆå†…å®¹UTF-8ç¼–ç ï¼‰
+        :param data: æ¶ˆæ¯æ•°æ®ï¼ˆå­—å…¸ï¼‰
+        :return: è¿”å›æ¶ˆæ¯å‘é€ç»“æœ
         """
         now = time.time()
 
-        # ¶¤¶¤×Ô¶¨Òå»úÆ÷ÈË°²È«ÉèÖÃ¼ÓÇ©Ê±£¬Ç©ÃûÖĞµÄÊ±¼ä´ÁÓëÇëÇóÊ±²»ÄÜ³¬¹ıÒ»¸öĞ¡Ê±£¬ËùÒÔÃ¿¸ö1Ğ¡Ê±ĞèÒª¸üĞÂÇ©Ãû
+        # é’‰é’‰è‡ªå®šä¹‰æœºå™¨äººå®‰å…¨è®¾ç½®åŠ ç­¾æ—¶ï¼Œç­¾åä¸­çš„æ—¶é—´æˆ³ä¸è¯·æ±‚æ—¶ä¸èƒ½è¶…è¿‡ä¸€ä¸ªå°æ—¶ï¼Œæ‰€ä»¥æ¯ä¸ª1å°æ—¶éœ€è¦æ›´æ–°ç­¾å
         if now - self.start_time >= 3600 and self.secret is not None and self.secret.startswith('SEC'):
             self.start_time = now
             self.update_webhook()
 
-        # ¶¤¶¤×Ô¶¨Òå»úÆ÷ÈËÏÖÔÚÃ¿·ÖÖÓ×î¶à·¢ËÍ20ÌõÏûÏ¢
+        # é’‰é’‰è‡ªå®šä¹‰æœºå™¨äººç°åœ¨æ¯åˆ†é’Ÿæœ€å¤šå‘é€20æ¡æ¶ˆæ¯
         self.queue.put(now)
         if self.queue.full():
             elapse_time = now - self.queue.get()
             if elapse_time < 60:
                 sleep_time = int(60 - elapse_time) + 1
-                logging.debug('¶¤¶¤¹Ù·½ÏŞÖÆ»úÆ÷ÈËÃ¿·ÖÖÓ×î¶à·¢ËÍ20Ìõ£¬µ±Ç°·¢ËÍÆµÂÊÒÑ´ïÏŞÖÆÌõ¼ş£¬ĞİÃß {}s'.format(str(sleep_time)))
+                logging.debug('é’‰é’‰å®˜æ–¹é™åˆ¶æœºå™¨äººæ¯åˆ†é’Ÿæœ€å¤šå‘é€20æ¡ï¼Œå½“å‰å‘é€é¢‘ç‡å·²è¾¾é™åˆ¶æ¡ä»¶ï¼Œä¼‘çœ  {}s'.format(str(sleep_time)))
                 time.sleep(sleep_time)
 
         try:
             post_data = json.dumps(data)
             response = requests.post(self.webhook, headers=self.headers, data=post_data)
         except requests.exceptions.HTTPError as exc:
-            logging.error("ÏûÏ¢·¢ËÍÊ§°Ü£¬ HTTP error: %d, reason: %s" % (exc.response.status_code, exc.response.reason))
+            logging.error("æ¶ˆæ¯å‘é€å¤±è´¥ï¼Œ HTTP error: %d, reason: %s" % (exc.response.status_code, exc.response.reason))
             raise
         except requests.exceptions.ConnectionError:
-            logging.error("ÏûÏ¢·¢ËÍÊ§°Ü£¬HTTP connection error!")
+            logging.error("æ¶ˆæ¯å‘é€å¤±è´¥ï¼ŒHTTP connection error!")
             raise
         except requests.exceptions.Timeout:
-            logging.error("ÏûÏ¢·¢ËÍÊ§°Ü£¬Timeout error!")
+            logging.error("æ¶ˆæ¯å‘é€å¤±è´¥ï¼ŒTimeout error!")
             raise
         except requests.exceptions.RequestException:
-            logging.error("ÏûÏ¢·¢ËÍÊ§°Ü, Request Exception!")
+            logging.error("æ¶ˆæ¯å‘é€å¤±è´¥, Request Exception!")
             raise
         else:
             try:
                 result = response.json()
             except JSONDecodeError:
-                logging.error("·şÎñÆ÷ÏìÓ¦Òì³££¬×´Ì¬Âë£º%s£¬ÏìÓ¦ÄÚÈİ£º%s" % (response.status_code, response.text))
-                return {'errcode': 500, 'errmsg': '·şÎñÆ÷ÏìÓ¦Òì³£'}
+                logging.error("æœåŠ¡å™¨å“åº”å¼‚å¸¸ï¼ŒçŠ¶æ€ç ï¼š%sï¼Œå“åº”å†…å®¹ï¼š%s" % (response.status_code, response.text))
+                return {'errcode': 500, 'errmsg': 'æœåŠ¡å™¨å“åº”å¼‚å¸¸'}
             else:
-                logging.debug('·¢ËÍ½á¹û£º%s' % result)
-                # ÏûÏ¢·¢ËÍÊ§°ÜÌáĞÑ£¨errcode ²»Îª 0£¬±íÊ¾ÏûÏ¢·¢ËÍÒì³££©£¬Ä¬ÈÏ²»ÌáĞÑ£¬¿ª·¢Õß¿ÉÒÔ¸ù¾İ·µ»ØµÄÏûÏ¢·¢ËÍ½á¹û×ÔĞĞÅĞ¶ÏºÍ´¦Àí
+                logging.debug('å‘é€ç»“æœï¼š%s' % result)
+                # æ¶ˆæ¯å‘é€å¤±è´¥æé†’ï¼ˆerrcode ä¸ä¸º 0ï¼Œè¡¨ç¤ºæ¶ˆæ¯å‘é€å¼‚å¸¸ï¼‰ï¼Œé»˜è®¤ä¸æé†’ï¼Œå¼€å‘è€…å¯ä»¥æ ¹æ®è¿”å›çš„æ¶ˆæ¯å‘é€ç»“æœè‡ªè¡Œåˆ¤æ–­å’Œå¤„ç†
                 if self.fail_notice and result.get('errcode', True):
                     time_now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
                     error_data = {
                         "msgtype": "text",
                         "text": {
-                            "content": "[×¢Òâ-×Ô¶¯Í¨Öª]¶¤¶¤»úÆ÷ÈËÏûÏ¢·¢ËÍÊ§°Ü£¬Ê±¼ä£º%s£¬Ô­Òò£º%s£¬Çë¼°Ê±¸ú½ø£¬Ğ»Ğ»!" % (
-                                time_now, result['errmsg'] if result.get('errmsg', False) else 'Î´ÖªÒì³£')
+                            "content": "[æ³¨æ„-è‡ªåŠ¨é€šçŸ¥]é’‰é’‰æœºå™¨äººæ¶ˆæ¯å‘é€å¤±è´¥ï¼Œæ—¶é—´ï¼š%sï¼ŒåŸå› ï¼š%sï¼Œè¯·åŠæ—¶è·Ÿè¿›ï¼Œè°¢è°¢!" % (
+                                time_now, result['errmsg'] if result.get('errmsg', False) else 'æœªçŸ¥å¼‚å¸¸')
                         },
                         "at": {
                             "isAtAll": False
                         }
                     }
-                    logging.error("ÏûÏ¢·¢ËÍÊ§°Ü£¬×Ô¶¯Í¨Öª£º%s" % error_data)
+                    logging.error("æ¶ˆæ¯å‘é€å¤±è´¥ï¼Œè‡ªåŠ¨é€šçŸ¥ï¼š%s" % error_data)
                     requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
                 return result
 
 
 class ActionCard(object):
     """
-    ActionCardÀàĞÍÏûÏ¢¸ñÊ½£¨ÕûÌåÌø×ª¡¢¶ÀÁ¢Ìø×ª£©
+    ActionCardç±»å‹æ¶ˆæ¯æ ¼å¼ï¼ˆæ•´ä½“è·³è½¬ã€ç‹¬ç«‹è·³è½¬ï¼‰
     """
 
     def __init__(self, title, text, btns, btn_orientation=0, hide_avatar=0):
         """
-        ActionCard³õÊ¼»¯
-        :param title: Ê×ÆÁ»á»°Í¸³öµÄÕ¹Ê¾ÄÚÈİ
-        :param text: markdown¸ñÊ½µÄÏûÏ¢
-        :param btns: °´Å¥ÁĞ±í£º£¨1£©°´Å¥ÊıÁ¿Îª1Ê±£¬ÕûÌåÌø×ªActionCardÀàĞÍ£»£¨2£©°´Å¥ÊıÁ¿´óÓÚ1Ê±£¬¶ÀÁ¢Ìø×ªActionCardÀàĞÍ£»
-        :param btn_orientation: 0£º°´Å¥ÊúÖ±ÅÅÁĞ£¬1£º°´Å¥ºáÏòÅÅÁĞ£¨¿ÉÑ¡£©
-        :param hide_avatar: 0£ºÕı³£·¢ÏûÏ¢ÕßÍ·Ïñ£¬1£ºÒş²Ø·¢ÏûÏ¢ÕßÍ·Ïñ£¨¿ÉÑ¡£©
+        ActionCardåˆå§‹åŒ–
+        :param title: é¦–å±ä¼šè¯é€å‡ºçš„å±•ç¤ºå†…å®¹
+        :param text: markdownæ ¼å¼çš„æ¶ˆæ¯
+        :param btns: æŒ‰é’®åˆ—è¡¨ï¼šï¼ˆ1ï¼‰æŒ‰é’®æ•°é‡ä¸º1æ—¶ï¼Œæ•´ä½“è·³è½¬ActionCardç±»å‹ï¼›ï¼ˆ2ï¼‰æŒ‰é’®æ•°é‡å¤§äº1æ—¶ï¼Œç‹¬ç«‹è·³è½¬ActionCardç±»å‹ï¼›
+        :param btn_orientation: 0ï¼šæŒ‰é’®ç«–ç›´æ’åˆ—ï¼Œ1ï¼šæŒ‰é’®æ¨ªå‘æ’åˆ—ï¼ˆå¯é€‰ï¼‰
+        :param hide_avatar: 0ï¼šæ­£å¸¸å‘æ¶ˆæ¯è€…å¤´åƒï¼Œ1ï¼šéšè—å‘æ¶ˆæ¯è€…å¤´åƒï¼ˆå¯é€‰ï¼‰
         """
         super(ActionCard, self).__init__()
         self.title = title
@@ -361,17 +361,17 @@ class ActionCard(object):
             if isinstance(btn, CardItem):
                 btn_list.append(btn.get_data())
         if btn_list:
-            btns = btn_list  # ¼æÈİ£º1¡¢´«ÈëCardItemÊ¾ÀıÁĞ±í£»2¡¢´«ÈëÊı¾İ×ÖµäÁĞ±í
+            btns = btn_list  # å…¼å®¹ï¼š1ã€ä¼ å…¥CardItemç¤ºä¾‹åˆ—è¡¨ï¼›2ã€ä¼ å…¥æ•°æ®å­—å…¸åˆ—è¡¨
         self.btns = btns
 
     def get_data(self):
         """
-        »ñÈ¡ActionCardÀàĞÍÏûÏ¢Êı¾İ£¨×Öµä£©
-        :return: ·µ»ØActionCardÊı¾İ
+        è·å–ActionCardç±»å‹æ¶ˆæ¯æ•°æ®ï¼ˆå­—å…¸ï¼‰
+        :return: è¿”å›ActionCardæ•°æ®
         """
         if all(map(is_not_null_and_blank_str, [self.title, self.text])) and len(self.btns):
             if len(self.btns) == 1:
-                # ÕûÌåÌø×ªActionCardÀàĞÍ
+                # æ•´ä½“è·³è½¬ActionCardç±»å‹
                 data = {
                     "msgtype": "actionCard",
                     "actionCard": {
@@ -385,7 +385,7 @@ class ActionCard(object):
                 }
                 return data
             else:
-                # ¶ÀÁ¢Ìø×ªActionCardÀàĞÍ
+                # ç‹¬ç«‹è·³è½¬ActionCardç±»å‹
                 data = {
                     "msgtype": "actionCard",
                     "actionCard": {
@@ -398,21 +398,21 @@ class ActionCard(object):
                 }
                 return data
         else:
-            logging.error("ActionCardÀàĞÍ£¬ÏûÏ¢±êÌâ»òÄÚÈİ»ò°´Å¥ÊıÁ¿²»ÄÜÎª¿Õ£¡")
-            raise ValueError("ActionCardÀàĞÍ£¬ÏûÏ¢±êÌâ»òÄÚÈİ»ò°´Å¥ÊıÁ¿²»ÄÜÎª¿Õ£¡")
+            logging.error("ActionCardç±»å‹ï¼Œæ¶ˆæ¯æ ‡é¢˜æˆ–å†…å®¹æˆ–æŒ‰é’®æ•°é‡ä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("ActionCardç±»å‹ï¼Œæ¶ˆæ¯æ ‡é¢˜æˆ–å†…å®¹æˆ–æŒ‰é’®æ•°é‡ä¸èƒ½ä¸ºç©ºï¼")
 
 
 class FeedLink(object):
     """
-    FeedCardÀàĞÍµ¥ÌõÏûÏ¢¸ñÊ½
+    FeedCardç±»å‹å•æ¡æ¶ˆæ¯æ ¼å¼
     """
 
     def __init__(self, title, message_url, pic_url):
         """
-        ³õÊ¼»¯µ¥ÌõÏûÏ¢ÎÄ±¾
-        :param title: µ¥ÌõÏûÏ¢ÎÄ±¾
-        :param message_url: µã»÷µ¥ÌõĞÅÏ¢ºó´¥·¢µÄURL
-        :param pic_url: µã»÷µ¥ÌõÏûÏ¢ºóÃæÍ¼Æ¬´¥·¢µÄURL
+        åˆå§‹åŒ–å•æ¡æ¶ˆæ¯æ–‡æœ¬
+        :param title: å•æ¡æ¶ˆæ¯æ–‡æœ¬
+        :param message_url: ç‚¹å‡»å•æ¡ä¿¡æ¯åè§¦å‘çš„URL
+        :param pic_url: ç‚¹å‡»å•æ¡æ¶ˆæ¯åé¢å›¾ç‰‡è§¦å‘çš„URL
         """
         super(FeedLink, self).__init__()
         self.title = title
@@ -421,8 +421,8 @@ class FeedLink(object):
 
     def get_data(self):
         """
-        »ñÈ¡FeedLinkÏûÏ¢Êı¾İ£¨×Öµä£©
-        :return: ±¾FeedLinkÏûÏ¢µÄÊı¾İ
+        è·å–FeedLinkæ¶ˆæ¯æ•°æ®ï¼ˆå­—å…¸ï¼‰
+        :return: æœ¬FeedLinkæ¶ˆæ¯çš„æ•°æ®
         """
         if all(map(is_not_null_and_blank_str, [self.title, self.message_url, self.pic_url])):
             data = {
@@ -432,21 +432,21 @@ class FeedLink(object):
             }
             return data
         else:
-            logging.error("FeedCardÀàĞÍµ¥ÌõÏûÏ¢ÎÄ±¾¡¢ÏûÏ¢Á´½Ó¡¢Í¼Æ¬Á´½Ó²»ÄÜÎª¿Õ£¡")
-            raise ValueError("FeedCardÀàĞÍµ¥ÌõÏûÏ¢ÎÄ±¾¡¢ÏûÏ¢Á´½Ó¡¢Í¼Æ¬Á´½Ó²»ÄÜÎª¿Õ£¡")
+            logging.error("FeedCardç±»å‹å•æ¡æ¶ˆæ¯æ–‡æœ¬ã€æ¶ˆæ¯é“¾æ¥ã€å›¾ç‰‡é“¾æ¥ä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("FeedCardç±»å‹å•æ¡æ¶ˆæ¯æ–‡æœ¬ã€æ¶ˆæ¯é“¾æ¥ã€å›¾ç‰‡é“¾æ¥ä¸èƒ½ä¸ºç©ºï¼")
 
 
 class CardItem(object):
     """
-    ActionCardºÍFeedCardÏûÏ¢ÀàĞÍÖĞµÄ×Ó¿Ø¼ş
+    ActionCardå’ŒFeedCardæ¶ˆæ¯ç±»å‹ä¸­çš„å­æ§ä»¶
     """
 
     def __init__(self, title, url, pic_url=None):
         """
-        CardItem³õÊ¼»¯
-        @param title: ×Ó¿Ø¼şÃû³Æ
-        @param url: µã»÷×Ó¿Ø¼şÊ±´¥·¢µÄURL
-        @param pic_url: FeedCardµÄÍ¼Æ¬µØÖ·£¬ActionCardÊ±²»ĞèÒª£¬¹ÊÄ¬ÈÏÎªNone
+        CardItemåˆå§‹åŒ–
+        @param title: å­æ§ä»¶åç§°
+        @param url: ç‚¹å‡»å­æ§ä»¶æ—¶è§¦å‘çš„URL
+        @param pic_url: FeedCardçš„å›¾ç‰‡åœ°å€ï¼ŒActionCardæ—¶ä¸éœ€è¦ï¼Œæ•…é»˜è®¤ä¸ºNone
         """
         super(CardItem, self).__init__()
         self.title = title
@@ -455,11 +455,11 @@ class CardItem(object):
 
     def get_data(self):
         """
-        »ñÈ¡CardItem×Ó¿Ø¼şÊı¾İ£¨×Öµä£©
-        @return: ×Ó¿Ø¼şµÄÊı¾İ
+        è·å–CardItemå­æ§ä»¶æ•°æ®ï¼ˆå­—å…¸ï¼‰
+        @return: å­æ§ä»¶çš„æ•°æ®
         """
         if all(map(is_not_null_and_blank_str, [self.title, self.url, self.pic_url])):
-            # FeedCardÀàĞÍ
+            # FeedCardç±»å‹
             data = {
                 "title": self.title,
                 "messageURL": self.url,
@@ -467,12 +467,12 @@ class CardItem(object):
             }
             return data
         elif all(map(is_not_null_and_blank_str, [self.title, self.url])):
-            # ActionCardÀàĞÍ
+            # ActionCardç±»å‹
             data = {
                 "title": self.title,
                 "actionURL": self.url
             }
             return data
         else:
-            logging.error("CardItemÊÇActionCardµÄ×Ó¿Ø¼şÊ±£¬title¡¢url²»ÄÜÎª¿Õ£»ÊÇFeedCardµÄ×Ó¿Ø¼şÊ±£¬title¡¢url¡¢pic_url²»ÄÜÎª¿Õ£¡")
-            raise ValueError("CardItemÊÇActionCardµÄ×Ó¿Ø¼şÊ±£¬title¡¢url²»ÄÜÎª¿Õ£»ÊÇFeedCardµÄ×Ó¿Ø¼şÊ±£¬title¡¢url¡¢pic_url²»ÄÜÎª¿Õ£¡")
+            logging.error("CardItemæ˜¯ActionCardçš„å­æ§ä»¶æ—¶ï¼Œtitleã€urlä¸èƒ½ä¸ºç©ºï¼›æ˜¯FeedCardçš„å­æ§ä»¶æ—¶ï¼Œtitleã€urlã€pic_urlä¸èƒ½ä¸ºç©ºï¼")
+            raise ValueError("CardItemæ˜¯ActionCardçš„å­æ§ä»¶æ—¶ï¼Œtitleã€urlä¸èƒ½ä¸ºç©ºï¼›æ˜¯FeedCardçš„å­æ§ä»¶æ—¶ï¼Œtitleã€urlã€pic_urlä¸èƒ½ä¸ºç©ºï¼")

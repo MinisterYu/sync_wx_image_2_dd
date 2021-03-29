@@ -1,12 +1,11 @@
-# -*- coding: gb2312 -*-
+# -*- coding: utf-8 -*-
 # ! /usr/bin/env python
 import requests
 import re
 import json
 import time
 import os
-import ding_chat_bot
-import oss_client
+import qywx_chat_bot
 import global_config
 import base64
 import hashlib
@@ -14,35 +13,32 @@ import sys
 import db_client
 
 
-class SyncImg2DingTalk:
+class SyncImg2QYWX:
 
     def __init__(self, delete_pic=False):
         self.logger = global_config.logger
 
-        # Î¢ĞÅ¹«ÖÚºÅºóÌ¨ÉèÖÃ
+        # å¾®ä¿¡å…¬ä¼—å·åå°è®¾ç½®
         self.main_url = global_config.MP_URL
         self.headers = global_config.MP_HEADERS
         self.img_url_temp = 'https://mp.weixin.qq.com/cgi-bin/getimgdata?token=' + global_config.MP_TOKEN + '&msgid={0}&mode=small&source=&fileId=0&ow=-1'
 
+        # ä¼ä¸šå¾®ä¿¡key
+        self.qywx_bot = ''
+
         # db
         self.db = db_client.DBClient()
 
-        # ding hook ÉèÖÃ
-        self.ding_hook = ding_chat_bot.DingtalkChatbot()
-
-        # ÌùÍ¼¿â ÉèÖÃ
-        self.oss = oss_client.OSSClient()
-
-        # Í¬²½ºóÊÇ·ñÉ¾³ı±¾µØÍ¼Æ¬
+        # åŒæ­¥åæ˜¯å¦åˆ é™¤æœ¬åœ°å›¾ç‰‡
         self.delete_pic = delete_pic
 
-        # ±¾µØ»º´æ¼ÓËÙ
+        # æœ¬åœ°ç¼“å­˜åŠ é€Ÿ
         self.cache = {}
 
-        # ³õÊ¼»¯±¾µØÍ¼Æ¬Ä¿Â¼
+        # åˆå§‹åŒ–æœ¬åœ°å›¾ç‰‡ç›®å½•
         self.init_folder()
 
-        # ³õÊ¼»¯»º´æ
+        # åˆå§‹åŒ–ç¼“å­˜
         self.init_cache()
 
     def init_cache(self):
@@ -91,16 +87,9 @@ class SyncImg2DingTalk:
 
         return True if len(data) else False
 
-    def load_image_from_mp(self, img_id):
-        pic_url = self.img_url_temp.format(img_id)
-        self.logger.info("get pic from url={0}".format(pic_url))
-        response = requests.get(pic_url, headers=self.headers)
-        data = response.content
-        return data
-
     def save_image_2_local(self, img_id):
         data = self.load_image_from_mp(img_id)
-        folder = './images/{0}'.format(self.now(True))
+        folder = './images/'
         if not os.path.exists(folder):
             os.mkdir(folder)
         file_path = folder + '/{0}.jpeg'.format(img_id)
@@ -138,15 +127,15 @@ class SyncImg2DingTalk:
             nick_name = item.get('nick_name')
             self.logger.info("start sync image: img_id={0}, send_by={1}".format(img_id, nick_name))
 
-            # ¼ÇÂ¼Ğ£Ñé,Î¢ĞÅÓĞ¼ÇÂ¼´æÔÚÔò²»¼ÌĞø
+            # è®°å½•æ ¡éªŒ,å¾®ä¿¡æœ‰è®°å½•å­˜åœ¨åˆ™ä¸ç»§ç»­
             if (self.is_exist(img_id=img_id)):
                 self.logger.info("sync process skipped,  find img_id  = {0} in sync_log".format(img_id))
                 continue
 
-            # ±£´æÍ¼Æ¬
+            # ä¿å­˜å›¾ç‰‡
             pic_path = self.save_image_2_local(img_id)
 
-            # ¼ÇÂ¼Ğ£Ñé,±¾µØ±íÇé´æÔÚÔò²»¼ÌĞø
+            # è®°å½•æ ¡éªŒ,æœ¬åœ°è¡¨æƒ…å­˜åœ¨åˆ™ä¸ç»§ç»­
             encode_ = self.encode_file(pic_path)
             if (self.is_exist(encode=encode_)):
                 self.logger.info(
@@ -154,28 +143,17 @@ class SyncImg2DingTalk:
                 os.remove(pic_path)
                 continue
 
-            # ÉÏ´«Í¼Æ¬
-            pic_url = self.oss.upload(pic_path)
-            self.logger.info("pic_url= " + pic_url)
-            if not pic_url:
-                self.logger.error("upload pic = {0} to oss response is null".format(pic_path))
-                continue
+            # å‘é€å›¾ç‰‡
+            qywx_chat_bot.send_images(pic_path, self.qywx_bot)
+            self.logger.info("finished sync image, info, pic_path={0}".format(pic_path))
+            # ç»“æœè®°å½•
+            self.insert_log(fake_id, img_id, nick_name, '', encode_)
 
-            # ·¢ËÍÍ¼Æ¬
-            self.ding_hook.send_image(pic_url)
-            self.logger.info("finished sync image, info, pic_path={0}, pic_path={1}".format(pic_path, pic_url))
-            # ½á¹û¼ÇÂ¼
-            self.insert_log(fake_id, img_id, nick_name, pic_url, encode_)
-
-            # É¾³ıÍ¼Æ¬½ÚÔ¼¿Õ¼ä
+            # åˆ é™¤å›¾ç‰‡èŠ‚çº¦ç©ºé—´
             if self.delete_pic:
                 os.remove(pic_path)
 
 
 if __name__ == '__main__':
-    sy = SyncImg2DingTalk()
-    # print(sy.encode_file('./images/2020-10-31/500616174.jpeg'))
-    # print(sy.encode_file('./images/2020-10-31/500616174.jpeg'))
-    # print(sy.encode_file('./images/2020-10-31/500616174.jpeg'))
-    # print(sy.search_log(base64=sy.encode_file('./images/2020-10-31/500616174.jpeg')))
+    sy = SyncImg2QYWX()
     sy.run()

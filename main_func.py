@@ -1,4 +1,4 @@
-# -*- coding: gb2312 -*-
+# -*- coding: utf-8 -*-
 # ! /usr/bin/env python
 import mp_img_sync
 from apscheduler.schedulers.background import BlockingScheduler
@@ -8,13 +8,13 @@ from global_config import logger, INTERVAL_TIME
 
 class Scheduler:
 
-    # 间隔时间不宜设置太短，否则任务会存在跳过情况：http://www.debug5.com/detail/474/
+    # 闂撮殧鏃堕棿涓嶅疁璁剧疆澶煭锛屽惁鍒欎换鍔′細瀛樺湪璺宠繃鎯呭喌锛歨ttp://www.debug5.com/detail/474/
     def __init__(self, inertval=INTERVAL_TIME):
         self.scheduler = BlockingScheduler()
         self.inertval = inertval
 
     def start(self):
-        sync = mp_img_sync.SyncImg2DingTalk(delete_pic=True)
+        sync = mp_img_sync.SyncImg2QYWX(delete_pic=True)
         self.scheduler.add_job(sync.run, 'interval', id='mp_sync_job', seconds=self.inertval)
         self.scheduler.add_listener(self.my_listener, EVENT_JOB_ERROR)
         self.scheduler.start()

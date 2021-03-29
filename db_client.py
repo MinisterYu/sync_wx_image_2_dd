@@ -1,4 +1,4 @@
-# -*- coding: gb2312 -*-
+# -*- coding: utf-8 -*-
 # ! /usr/bin/env python
 import sqlite3
 import global_config
@@ -11,7 +11,7 @@ class DBClient:
         self.conn = None
 
     def connect(self):
-        # sqlite3 ÉèÖÃ
+        # sqlite3 è®¾ç½®
         self.conn = sqlite3.connect(global_config.DB_CONFIG, check_same_thread=False)
         return self.conn
 

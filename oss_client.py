@@ -1,4 +1,4 @@
-# -*- coding: gb2312 -*-
+# -*- coding: utf-8 -*-
 # ! /usr/bin/env python
 
 import requests_toolbelt
@@ -8,13 +8,13 @@ import global_config
 import db_client
 
 
-# API 文档：https://doc.sm.ms/
+# API 鏂囨。锛歨ttps://doc.sm.ms/
 class OSSClient:
 
     def __init__(self):
 
         self.logger = global_config.logger
-        # 上传接口
+        # 涓婁紶鎺ュ彛
         self.url = global_config.MS_BASE_URL
         # token
         self.token = global_config.MS_TOKEN
