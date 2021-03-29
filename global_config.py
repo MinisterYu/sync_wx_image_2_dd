@@ -3,6 +3,9 @@
 import logging
 import os
 
+# 后台轮训时间
+INTERVAL_TIME = 30
+
 # 微信公众号配置
 # 登录 cookies  -- 每次修改
 COOKIES = "ua_id=Ho4hzV3FnR1ZB8DBAAAAAAAuGpEMu1UOgOsf4wmGqao=; pgv_pvi=7355956224; pgv_si=s9599310848; openid2ticket_oY5mC09S3gI6H3tkJng-5UHieeH4=5IzHfMP5rXARynd0gboi+z7JoVpTVRsC+30o0DsMNmM=; mm_lang=zh_CN; ptui_loginuin=173682166@qq.com; uin=o0173682166; skey=@ndxQordgT; RK=gI5syesGOY; ptcz=f8b4b8616467301a9d857022e184852c6c8220aaf5ffe75728d3f52db37197f4; media_ticket=558a0eca40e65b7b69cc18137d1ef547934cfbb1; media_ticket_id=3594344901; sig=h01fe93019a83854831be24877c006d39121dbf06a5108e4ebb85f400664b1d5fbe01a382f8e6419802; uuid=96cc27ad1cbcd1c81d1e5f6eeacccedf; rand_info=CAESIKEIOuB8dQ5AS+QcnL+UP4Sjm5QDx0VtIeOIJloRh9Sv; slave_bizuin=3594344901; data_bizuin=3548551523; bizuin=3594344901; data_ticket=WJrHpoM2C709CK8xJtPWyZZ8VGa2zb9u0tiIz8agEVt32672L+JthUk0wFhT9+FJ; slave_sid=cnhkRkJSU1lrdzJtOUNDR0VUZXlTdnVrWGxtX1RGTnZMang0VFMydHVCeHRtR01ZR0I2R1JHZ2VWTWl1NDl1dEtrMEN3QVdyZDNZWmRyYkNFeEdWVFRVUUdiM1dCXzRZYzJmbGxNcDF3c2RISDI2b1I0OE9yUzJPdzJrR0szd2FGTmxSRnZBZDhJWjN1UGto; slave_user=gh_46235149cb45; xid=16a55d845e2e257dd9e2f701dbc8e73b"
@@ -26,38 +29,9 @@ MP_HEADERS = {'authority': 'mp.weixin.qq.com',
 
 # ----------------------------------------------------
 
-# OSS 配置
-# 上传接口
-MS_BASE_URL = "https://sm.ms/api/v2/"
-
-# 上传图册的TOKEN
-MS_TOKEN = "eoYPfJquYqFwibyRFLRksxaFSuWK2cC2"
-
-# 请求header
-MS_HEADERS = {
-    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
-    'Accept-Encoding': 'gzip, deflate',
-    'Accept-Language': 'zh-CN,zh;q=0.9',
-    'Connection': 'keep-alive',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.94 Safari/537.36',
-    'Authorization': MS_TOKEN
-}
-
-#轮训时间
-INTERVAL_TIME = 30
+WX_BOT_KEY = ''
 
 # ----------------------------------------------------
-
-# 钉钉机器人配置
-# 初始化设定《不如跳舞》群机器人siri配置
-# ding hook
-DING_WEBHOOK = 'https://oapi.dingtalk.com/robot/send?access_token=18fd9aaede1ca56cf868993ae3352e49c3e73062a0d6bce7f4944031fcc84bdd'
-
-# 加签秘钥
-DING_SECRET = 'SEC4d8e90ce12b9e3d9dc7b496200c857d4dd065d2008ece7254c5b799b8b8808c2'
-
-# ----------------------------------------------------
-
 # 系统配置
 
 # DB数据

@@ -17,6 +17,7 @@ class SyncImg2QYWX:
 
     def __init__(self, delete_pic=False):
         self.logger = global_config.logger
+        self.pic_folder = './images'
 
         # 微信公众号后台设置
         self.main_url = global_config.MP_URL
@@ -24,7 +25,7 @@ class SyncImg2QYWX:
         self.img_url_temp = 'https://mp.weixin.qq.com/cgi-bin/getimgdata?token=' + global_config.MP_TOKEN + '&msgid={0}&mode=small&source=&fileId=0&ow=-1'
 
         # 企业微信key
-        self.qywx_bot = ''
+        self.qywx_bot = global_config.WX_BOT_KEY
 
         # db
         self.db = db_client.DBClient()
@@ -48,7 +49,7 @@ class SyncImg2QYWX:
             self.cache[i[1]] = i[2]
 
     def init_folder(self):
-        if not os.path.exists('./images'):
+        if not os.path.exists(self.pic_folder):
             os.mkdir('images')
 
     def insert_log(self, fake_id, img_id, nick_name, pic_url, encode):
@@ -89,10 +90,7 @@ class SyncImg2QYWX:
 
     def save_image_2_local(self, img_id):
         data = self.load_image_from_mp(img_id)
-        folder = './images/'
-        if not os.path.exists(folder):
-            os.mkdir(folder)
-        file_path = folder + '/{0}.jpeg'.format(img_id)
+        file_path = self.pic_folder + '/{0}.jpeg'.format(img_id)
         with open(file_path, 'wb') as fb:
             fb.write(data)
         return file_path
